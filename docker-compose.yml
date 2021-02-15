@@ -1,0 +1,21 @@
+services:
+  parse:
+    build: .
+    ports:
+      - '1337:1337'
+    environment:
+      - PARSE_SERVER_APPLICATION_ID=${APP_ID}
+      - PARSE_SERVER_MASTER_KEY=${MASTER_KEY}
+      - PARSE_SERVER_DATABASE_URI=${DB_URL}
+      - PARSE_SERVER_START_LIVE_QUERY_SERVER=1
+      - PARSE_SERVER_LIVE_QUERY={"classNames":["TempTable","MyClass","Session","AudioVideoState","Test_AudioVideoState","Masterclass"],"redisURL":${REDIS_URL}}
+      - PARSE_SERVER_LIVE_QUERY_SERVER_OPTIONS={"redisURL":${REDIS_URL}}
+      - PARSE_SERVER_CLOUD=/parse-server/cloud/main.js
+      - VERBOSE=false
+    volumes:
+      - 'parse_data:/parse_data'
+      - './cloud:/parse-server/cloud'
+    restart: always
+volumes:
+  parse_data:
+    driver: local
