@@ -399,9 +399,13 @@ class ParseLiveQueryServer {
       const client = this.clients.get(clientId);
       this.clients.delete(clientId);
 
+      let className = undefined
+      let queryName = undefined
       // Delete client from subscriptions
       for (const [requestId, subscriptionInfo] of _.entries(client.subscriptionInfos)) {
         const subscription = subscriptionInfo.subscription;
+        className = subscription.className
+        queryName = subscription.query
         subscription.deleteClientSubscription(clientId, requestId);
 
         // If there is no client which is subscribing this subscription, remove it from subscriptions
@@ -420,6 +424,8 @@ class ParseLiveQueryServer {
       runLiveQueryEventHandlers({
         event: 'ws_disconnect',
         clients: this.clients.size,
+        className: className,
+        queryName: queryName,
         subscriptions: this.subscriptions.size,
         useMasterKey: client.hasMasterKey,
         installationId: client.installationId,
@@ -667,6 +673,8 @@ class ParseLiveQueryServer {
     }
     const client = this.clients.get(parseWebsocket.clientId);
     const className = request.query.className;
+    const queryName = request.query.where;
+    
     try {
       await maybeRunSubscribeTrigger('beforeSubscribe', className, request);
 
@@ -712,6 +720,8 @@ class ParseLiveQueryServer {
         client,
         event: 'subscribe',
         clients: this.clients.size,
+        className: className,
+        queryName: queryName,
         subscriptions: this.subscriptions.size,
         sessionToken: request.sessionToken,
         useMasterKey: client.hasMasterKey,
