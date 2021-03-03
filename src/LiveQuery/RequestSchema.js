@@ -4,7 +4,7 @@ const general = {
   properties: {
     op: {
       type: 'string',
-      enum: ['connect', 'subscribe', 'unsubscribe', 'update'],
+      enum: ['connect', 'subscribe', 'unsubscribe', 'update', 'agora'],
     },
   },
   required: ['op'],
@@ -37,6 +37,52 @@ const connect = {
       type: 'string',
     },
     installationId: {
+      type: 'string',
+    },
+  },
+  required: ['op', 'applicationId'],
+  additionalProperties: false,
+};
+
+const agora = {
+  title: 'Agora logs schema',
+  type: 'object',
+  properties: {
+    op: 'agora',
+    applicationId: {
+      type: 'string',
+    },
+    javascriptKey: {
+      type: 'string',
+    },
+    masterKey: {
+      type: 'string',
+    },
+    clientKey: {
+      type: 'string',
+    },
+    windowsKey: {
+      type: 'string',
+    },
+    restAPIKey: {
+      type: 'string',
+    },
+    sessionToken: {
+      type: 'string',
+    },
+    installationId: {
+      type: 'string',
+    },
+    quality: {
+      type: 'string',
+    },
+    strength: {
+      type: 'number',
+    },
+    userId: {
+      type: 'string',
+    },
+    sessionId: {
       type: 'string',
     },
   },
@@ -136,6 +182,7 @@ const unsubscribe = {
 const RequestSchema = {
   general: general,
   connect: connect,
+  agora: agora,
   subscribe: subscribe,
   update: update,
   unsubscribe: unsubscribe,

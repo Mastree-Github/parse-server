@@ -372,6 +372,9 @@ class ParseLiveQueryServer {
         case 'update':
           this._handleUpdateSubscription(parseWebsocket, request);
           break;
+	case 'agora':
+	  Parse.Cloud.run('agoraTrigger', request)
+	  break;
         case 'unsubscribe':
           this._handleUnsubscribe(parseWebsocket, request);
           break;
