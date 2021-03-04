@@ -58,7 +58,7 @@ Parse.Cloud.onLiveQueryEvent(
           let value = 'd:' + Date.now();
           const query = new Parse.Query('SessionLogs');
           query.equalTo('sessionId', queryName.sessionId);
-          query.equalTo('userId', queryName.userId['$in'][0]);
+          query.equalTo('userId', queryName.userId);
           query
             .find()
             .then(results => {
