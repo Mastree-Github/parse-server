@@ -27,6 +27,7 @@ COPY bin bin
 COPY public_html public_html
 COPY views views
 COPY --from=build /tmp/lib lib
+COPY cloud/main.js cloud/main.js
 RUN mkdir -p logs && chown -R node: logs
 
 ENV PORT=1337
