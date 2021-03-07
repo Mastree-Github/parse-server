@@ -2,6 +2,7 @@ const query = new Parse.Query('SessionLogs');
 
 const liveQueryTrigger = async (event, className, queryName) => {
   try {
+    console.log("---- L I V E Q U E R Y * H I T ----")
     if (event == 'subscribe' && className) {
       if (className == 'Sessions') {
         let value = 'c:' + Date.now();
