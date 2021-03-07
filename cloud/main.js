@@ -1,4 +1,4 @@
-const query = Parse.Query('SessionLogs');
+const query = new Parse.Query('SessionLogs');
 
 const liveQueryTrigger = async (event, className, queryName) => {
   try {
