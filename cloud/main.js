@@ -105,7 +105,7 @@ Parse.Cloud.onLiveQueryEvent(
     queryName,
   }) => {
     console.log('--------------- No of connections ------------', clients);
-    //liveQueryTrigger(event, className, queryName)
+    liveQueryTrigger(event, className, queryName)
     return;
   }
 );
