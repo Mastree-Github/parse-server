@@ -4,7 +4,7 @@ const DISCONNECT = 'ws_disconnect';
 
 const updateSessionLogs = async (value, queryName) => {
   query.equalTo('sessionId', queryName.sessionId);
-  query.equalTo('userId', queryName.userId);
+  query.equalTo('userId', queryName.userIds);
   query
     .find()
     .then(results => {
@@ -13,7 +13,7 @@ const updateSessionLogs = async (value, queryName) => {
         let SessionLogs = Parse.Object.extend('SessionLogs');
         let sessionLog = new SessionLogs();
         sessionLog.set('sessionId', queryName.sessionId);
-        sessionLog.set('userId', queryName.userId);
+        sessionLog.set('userId', queryName.userIds);
         let data = [];
         data.push(value);
         sessionLog.set('action', data);
