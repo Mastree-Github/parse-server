@@ -44,10 +44,10 @@ const updateSessionLogs = async (value, queryName) => {
 const liveQueryTrigger = async (event, className, queryName, currentTime) => {
   try {
     console.log('---- L I V E Q U E R Y ----');
-    if (event == SUBSCRIBE && className == 'Sessions') {
+    if (event == SUBSCRIBE && className == 'Session') {
       let value = 'c:' + currentTime;
       updateSessionLogs(value, queryName);
-    } else if (event == DISCONNECT && className == 'Sessions') {
+    } else if (event == DISCONNECT && className == 'Session') {
       let value = 'd:' + currentTime;
       updateSessionLogs(value, queryName);
     }
@@ -72,7 +72,7 @@ Parse.Cloud.onLiveQueryEvent(
     queryName,
   }) => {
     console.log('--------------- current total connections ------------', clients);
-    if ((event == SUBSCRIBE || event == DISCONNECT) && className == 'Sessions') {
+    if ((event == SUBSCRIBE || event == DISCONNECT) && className == 'Session') {
       let currentTime = Date.now();
       liveQueryTrigger(event, className, queryName, currentTime);
     }
