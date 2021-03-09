@@ -1,88 +1,55 @@
 const query = new Parse.Query('SessionLogs');
+const SUBSCRIBE = 'subscribe';
+const DISCONNECT = 'ws_disconnect';
 
-const liveQueryTrigger = async (event, className, queryName) => {
+const updateSessionLogs = async (value, queryName) => {
+  query.equalTo('sessionId', queryName.sessionId);
+  query.equalTo('userId', queryName.userId);
+  query
+    .find()
+    .then(results => {
+      // If there is no entry for that session and user
+      if (results.length == 0) {
+        let SessionLogs = Parse.Object.extend('SessionLogs');
+        let sessionLog = new SessionLogs();
+        sessionLog.set('sessionId', queryName.sessionId);
+        sessionLog.set('userId', queryName.userId);
+        let data = [];
+        data.push(value);
+        sessionLog.set('action', data);
+        // creating log object
+        sessionLog.save().then(
+          log => {
+            console.log('New object created with objectId: ' + log.id);
+          },
+          error => {
+            console.log('Failed to create new object, with error code: ' + error.message);
+          }
+        );
+      } else {
+        // Update the action if the unique entry for user and session exists
+        // Ideally there will be only one row, handled to loop over to avoid the issue
+        results.forEach(log => {
+          log.add('action', value);
+          log.save();
+          console.log('updated the object with sessionLogs entry');
+        });
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
+};
+
+const liveQueryTrigger = async (event, className, queryName, currentTime) => {
   try {
-    console.log("---- L I V E Q U E R Y * H I T ----")
-    if (event == 'subscribe' && className) {
-      if (className == 'Sessions') {
-        let value = 'c:' + Date.now();
-        //const query = new Parse.Query('SessionLogs');
-        query.equalTo('sessionId', queryName.sessionId);
-        query.equalTo('userId', queryName.userId);
-        query
-          .find()
-          .then(results => {
-            if (results.length == 0) {
-              const GameScore = Parse.Object.extend('SessionLogs');
-              const gameScore = new GameScore();
-              gameScore.set('sessionId', queryName.sessionId);
-              gameScore.set('userId', queryName.userId['$in'][0]);
-              let data = [];
-              data.push(value);
-              gameScore.set('action', data);
-              gameScore.save().then(
-                gameScore => {
-                  // Execute any logic that should take place after the object is saved.
-                  console.log('New object created with objectId: ' + gameScore.id);
-                },
-                error => {
-                  // Execute any logic that should take place if the save fails.
-                  // error is a Parse.Error with an error code and message.
-                  console.log('Failed to create new object, with error code: ' + error.message);
-                }
-              );
-            } else {
-              results.forEach(live => {
-                live.add('action', value);
-                live.save();
-                console.log('updated the object with sessionLogs entry');
-              });
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      }
-    } else if (event == 'ws_disconnect' && className) {
-      if (className == 'Sessions') {
-        let value = 'd:' + Date.now();
-        const query = new Parse.Query('SessionLogs');
-        query.equalTo('sessionId', queryName.sessionId);
-        query.equalTo('userId', queryName.userId);
-        query
-          .find()
-          .then(results => {
-            if (results.length == 0) {
-              const GameScore = Parse.Object.extend('SessionLogs');
-              const gameScore = new GameScore();
-              gameScore.set('sessionId', queryName.sessionId);
-              gameScore.set('userId', queryName.userId);
-              let data = [];
-              data.push(value);
-              gameScore.set('action', data);
-              gameScore.save().then(
-                gameScore => {
-                  // Execute any logic that should take place after the object is saved.
-                  console.log('New object created with objectId: ' + gameScore.id);
-                },
-                error => {
-                  // Execute any logic that should take place if the save fails.
-                  // error is a Parse.Error with an error code and message.
-                  console.log('Failed to create new object, with error code: ' + error.message);
-                }
-              );
-            } else {
-              results.forEach(live => {
-                live.add('action', value);
-                live.save();
-                console.log('updated disconnect entry with the mentioned objectId');
-              });
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      }
+    console.log('---- L I V E Q U E R Y ----');
+    if (event == SUBSCRIBE && className == 'Sessions') {
+      let value = 'c:' + currentTime;
+      updateSessionLogs(value, queryName);
+    } else if (event == DISCONNECT && className == 'Sessions') {
+      let value = 'd:' + currentTime;
+      updateSessionLogs(value, queryName);
     }
   } catch (e) {
     console.log(e);
@@ -104,21 +71,24 @@ Parse.Cloud.onLiveQueryEvent(
     className,
     queryName,
   }) => {
-    console.log('--------------- No of connections ------------', clients);
-    liveQueryTrigger(event, className, queryName)
+    console.log('--------------- current total connections ------------', clients);
+    if ((event == SUBSCRIBE || event == DISCONNECT) && className == 'Sessions') {
+      let currentTime = Date.now();
+      liveQueryTrigger(event, className, queryName, currentTime);
+    }
     return;
   }
 );
 
 Parse.Cloud.define('agoraTrigger', async request => {
-  console.log('--------------- A G O R A ------------');
+  console.log('--------------- A G O R A --------------- ');
   request = request.params;
-  const GameScore = Parse.Object.extend('AgoraLogs');
-  const gameScore = new GameScore();
-  gameScore.set('sessionId', request.sessionId);
-  gameScore.set('userId', request.userId);
-  gameScore.set('quality', request.quality);
-  gameScore.set('strength', request.strength);
-  gameScore.save();
+  let AgoraLogs = Parse.Object.extend('AgoraLogs');
+  let newLog = new AgoraLogs();
+  newLog.set('sessionId', request.sessionId);
+  newLog.set('userId', request.userId);
+  newLog.set('quality', request.quality);
+  newLog.set('strength', request.strength);
+  newLog.save();
   return;
 });
