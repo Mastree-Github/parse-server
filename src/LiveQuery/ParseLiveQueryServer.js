@@ -402,15 +402,13 @@ class ParseLiveQueryServer {
       const client = this.clients.get(clientId);
       this.clients.delete(clientId);
 
-      let className = undefined
-      let queryName = undefined
+      let className = []
+      let queryName = {}
       // Delete client from subscriptions
       for (const [requestId, subscriptionInfo] of _.entries(client.subscriptionInfos)) {
         const subscription = subscriptionInfo.subscription;
-        if(subscription.className == 'Session') {
-          className = subscription.className
-          queryName = subscription.query
-        }
+        className.push(subscription.className)
+        queryName[subscription.className] = subscription.query
         subscription.deleteClientSubscription(clientId, requestId);
 
         // If there is no client which is subscribing this subscription, remove it from subscriptions

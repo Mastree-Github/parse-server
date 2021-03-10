@@ -1,6 +1,7 @@
 const query = new Parse.Query('SessionLogs');
 const SUBSCRIBE = 'subscribe';
 const DISCONNECT = 'ws_disconnect';
+const UNSUBSCRIBE = 'unsubscribe'
 
 const updateSessionLogs = async (value, queryName) => {
   query.equalTo('sessionId', queryName.sessionId);
@@ -47,9 +48,9 @@ const liveQueryTrigger = async (event, className, queryName, currentTime) => {
     if (event == SUBSCRIBE && className == 'Session') {
       let value = 'c:' + currentTime;
       updateSessionLogs(value, queryName);
-    } else if (event == DISCONNECT && className == 'Session') {
+    } else if ((event == DISCONNECT || event == UNSUBSCRIBE) && 'Session' in queryName) {
       let value = 'd:' + currentTime;
-      updateSessionLogs(value, queryName);
+      updateSessionLogs(value, queryName['Session']);
     }
   } catch (e) {
     console.log(e);
@@ -75,10 +76,7 @@ Parse.Cloud.onLiveQueryEvent(
     console.log(event, className)
     console.log(queryName)
     if (
-      (event == SUBSCRIBE || event == DISCONNECT) &&
-      className == 'Session' &&
-      'userIds' in queryName &&
-      'sessionId' in queryName
+      (event == SUBSCRIBE || event == DISCONNECT || event == UNSUBSCRIBE)
     ) {
       let currentTime = Date.now();
       liveQueryTrigger(event, className, queryName, currentTime);
