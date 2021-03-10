@@ -372,9 +372,9 @@ class ParseLiveQueryServer {
         case 'update':
           this._handleUpdateSubscription(parseWebsocket, request);
           break;
-	case 'agora':
-	  Parse.Cloud.run('agoraTrigger', request)
-	  break;
+        case 'agora':
+          Parse.Cloud.run('agoraTrigger', request)
+          break;
         case 'unsubscribe':
           this._handleUnsubscribe(parseWebsocket, request);
           break;
@@ -407,8 +407,10 @@ class ParseLiveQueryServer {
       // Delete client from subscriptions
       for (const [requestId, subscriptionInfo] of _.entries(client.subscriptionInfos)) {
         const subscription = subscriptionInfo.subscription;
-        className = subscription.className
-        queryName = subscription.query
+        if(subscription.className == 'Session') {
+          className = subscription.className
+          queryName = subscription.query
+        }
         subscription.deleteClientSubscription(clientId, requestId);
 
         // If there is no client which is subscribing this subscription, remove it from subscriptions
