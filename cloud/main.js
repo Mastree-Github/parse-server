@@ -44,6 +44,8 @@ const updateSessionLogs = async (value, queryName) => {
 const liveQueryTrigger = async (event, className, queryName, currentTime) => {
   try {
     console.log('---- L I V E Q U E R Y ----');
+    console.log(event, className)
+    console.log(queryName)
     if (event == SUBSCRIBE && className == 'Session') {
       let value = 'c:' + currentTime;
       updateSessionLogs(value, queryName);
