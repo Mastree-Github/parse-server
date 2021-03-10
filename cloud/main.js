@@ -48,7 +48,7 @@ const liveQueryTrigger = async (event, className, queryName, currentTime) => {
     if (event == SUBSCRIBE && className == 'Session') {
       let value = 'c:' + currentTime;
       updateSessionLogs(value, queryName);
-    } else if ((event == DISCONNECT || event == UNSUBSCRIBE) && 'Session' in queryName) {
+    } else if ((event == DISCONNECT || event == UNSUBSCRIBE) && queryName && ('Session' in queryName)) {
       let value = 'd:' + currentTime;
       updateSessionLogs(value, queryName['Session']);
     }
@@ -76,7 +76,7 @@ Parse.Cloud.onLiveQueryEvent(
     console.log(event, className)
     console.log(queryName)
     if (
-      (event == SUBSCRIBE || event == DISCONNECT || event == UNSUBSCRIBE)
+      (event == SUBSCRIBE || event == DISCONNECT || event == UNSUBSCRIBE) && queryName
     ) {
       let currentTime = Date.now();
       liveQueryTrigger(event, className, queryName, currentTime);
