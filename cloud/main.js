@@ -72,7 +72,12 @@ Parse.Cloud.onLiveQueryEvent(
     queryName,
   }) => {
     console.log('--------------- current total connections ------------', clients);
-    if ((event == SUBSCRIBE || event == DISCONNECT) && className == 'Session') {
+    if (
+      (event == SUBSCRIBE || event == DISCONNECT) &&
+      className == 'Session' &&
+      'userIds' in queryName &&
+      'sessionId' in queryName
+    ) {
       let currentTime = Date.now();
       liveQueryTrigger(event, className, queryName, currentTime);
     }
