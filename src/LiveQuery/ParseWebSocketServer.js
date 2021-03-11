@@ -23,6 +23,9 @@ export class ParseWebSocketServer {
         if (ws.readyState == ws.OPEN) {
           ws.ping();
         } else {
+          //ws.close()
+          logger.info(` ----  Websocket is not in open state hence closing it ---- `)
+          wss.close()
           clearInterval(pingIntervalId);
         }
       }, config.websocketTimeout || 10 * 1000);
