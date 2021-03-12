@@ -20,13 +20,13 @@ export class ParseWebSocketServer {
       onConnect(new ParseWebSocket(ws));
       // Send ping to client periodically
       const pingIntervalId = setInterval(() => {
-        logger.info(` ------ pinging client at an interval & its state ${ws.readyState} -----`)
+        //logger.info(` ------ pinging client at an interval & its state ${ws.readyState} -----`)
         if (ws.readyState == ws.OPEN) {
           ws.ping();
         } else {
           //ws.close()
-          logger.info(` ----  Websocket is not in open state hence closing it ---- `)
-          wss.close()
+          //logger.info(` ----  Websocket is not in open state hence closing it ---- `)
+          //wss.close()
           clearInterval(pingIntervalId);
         }
       }, config.websocketTimeout || 10 * 1000);
