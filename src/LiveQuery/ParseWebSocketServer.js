@@ -20,6 +20,7 @@ export class ParseWebSocketServer {
       onConnect(new ParseWebSocket(ws));
       // Send ping to client periodically
       const pingIntervalId = setInterval(() => {
+        logger.info(` ------ pinging client at an interval & its state ${ws.readyState} -----`)
         if (ws.readyState == ws.OPEN) {
           ws.ping();
         } else {
