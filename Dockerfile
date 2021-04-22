@@ -5,6 +5,9 @@ RUN apk update; \
   apk add git;
 WORKDIR /tmp
 COPY package*.json ./
+
+RUN npm i --package-lock-only
+
 RUN npm ci
 COPY . .
 RUN npm run build
@@ -20,6 +23,8 @@ VOLUME /parse-server/cloud /parse-server/config
 WORKDIR /parse-server
 
 COPY package*.json ./
+
+RUN npm install
 
 RUN npm ci --production --ignore-scripts
 

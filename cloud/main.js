@@ -2,6 +2,8 @@ const query = new Parse.Query('SessionLogs');
 const SUBSCRIBE = 'subscribe';
 const DISCONNECT = 'ws_disconnect';
 const UNSUBSCRIBE = 'unsubscribe';
+const rp = require("request-promise");
+const DTA_URL = process.env.PARSE_SERVER_DTA_URL;
 
 const updateSessionLogs = async (value, queryName) => {
   if (queryName.sessionId && queryName.userIds) {
@@ -44,9 +46,48 @@ const updateSessionLogs = async (value, queryName) => {
   }
 };
 
+const sendHTTPReq = async (userId, id, userType) => {
+  console.log('---------- sendHTTP --------------')
+  let body = {
+    id: id,
+    user_id: userId,
+    type: userType
+  };
+  let options = {
+    method: "POST",
+    url:DTA_URL,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: body,
+    json: true,
+  };
+  return rp(options)
+    .then((parsedBody) => {
+      console.log(parsedBody)
+      return Promise.resolve(parsedBody);
+    })
+    .catch((err) => {
+      console.log(err)
+      return err;
+    });
+}
+
+const joinDynamicTrialSession= async (queryName) => {
+  try {
+    if (queryName.userId && queryName.id && queryName.userType) {
+      sendHTTPReq(queryName.userId, queryName.id, queryName.userType)
+    }
+  } catch(e) {
+    console.log(e);
+  }
+}
+
 const liveQueryTrigger = async (event, className, queryName, currentTime) => {
   try {
     console.log('---- L I V E Q U E R Y ----');
+    console.log(event)
+    console.log(className)
     if (event == SUBSCRIBE && className == 'Session') {
       let value = 'c:' + currentTime;
       updateSessionLogs(value, queryName);
@@ -57,6 +98,10 @@ const liveQueryTrigger = async (event, className, queryName, currentTime) => {
     ) {
       let value = 'd:' + currentTime;
       updateSessionLogs(value, queryName['Session']);
+    } else if (event == SUBSCRIBE && className == 'TrialSession')
+     {
+      console.log(" ----- hitting the func ------")
+      joinDynamicTrialSession(queryName);
     }
   } catch (e) {
     console.log(e);

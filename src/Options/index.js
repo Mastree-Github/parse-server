@@ -22,6 +22,9 @@ export interface ParseServerOptions {
   /* URL to your parse server with http:// or https://.
   :ENV: PARSE_SERVER_URL */
   serverURL: string;
+  /* URL to your dta server with http:// or https://.
+  :ENV: PARSE_SERVER_DTA_URL */
+  dtaURL: string;
   /* Restrict masterKey to be used by only these ips, defaults to [] (allow all ips)
   :DEFAULT: [] */
   masterKeyIps: ?(string[]);

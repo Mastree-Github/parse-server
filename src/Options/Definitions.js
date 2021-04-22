@@ -42,6 +42,11 @@ module.exports.ParseServerOptions = {
     help: 'Your Parse Application ID',
     required: true,
   },
+  dtaURL: {
+    env: 'PARSE_SERVER_DTA_URL',
+    help: 'URL for the DTA server',
+    required: true,
+  },
   appName: {
     env: 'PARSE_SERVER_APP_NAME',
     help: 'Sets the app name',

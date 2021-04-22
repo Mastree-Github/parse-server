@@ -1,21 +1,62 @@
+version: '3.9'
 services:
-  parse:
-    build: .
-    ports:
-      - '1337:1337'
-    environment:
-      - PARSE_SERVER_APPLICATION_ID=${APP_ID}
-      - PARSE_SERVER_MASTER_KEY=${MASTER_KEY}
-      - PARSE_SERVER_DATABASE_URI=${DB_URL}
-      - PARSE_SERVER_START_LIVE_QUERY_SERVER=1
-      - PARSE_SERVER_LIVE_QUERY={"classNames":["TempTable","MyClass","Session","AudioVideoState","Test_AudioVideoState","Masterclass"],"redisURL":${REDIS_URL}}
-      - PARSE_SERVER_LIVE_QUERY_SERVER_OPTIONS={"redisURL":${REDIS_URL}}
-      - PARSE_SERVER_CLOUD=/parse-server/cloud/main.js
-      - VERBOSE=false
-    volumes:
-      - 'parse_data:/parse_data'
-      - './cloud:/parse-server/cloud'
-    restart: always
-volumes:
-  parse_data:
-    driver: local
+
+    mongo:
+        image: mongo
+        ports:
+            - 27017:27017
+        volumes:
+            - ../data-db:/data/db
+    postgres:
+        image: postgres
+        restart: always
+        ports:
+            - 5432:5432
+        environment:
+            - POSTGRES_USER=mastreeuser
+            - POSTGRES_PASSWORD=password
+            - POSTGRES_DB=postgres
+        volumes:
+            - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+            - ../data-pg:/var/lib/postgresql/data
+      
+    redis:
+        image: redis
+        #container_name: cache
+        ports:
+            - 6379:6379
+        
+    parse:
+        #image: registry.digitalocean.com/parse-server/parse-server_parse
+        build: .
+        depends_on:
+            - mongo
+        ports:
+            - 1337:1337
+        links:
+            - mongo
+        restart: always
+        environment:
+            - PARSE_SERVER_APPLICATION_ID=yourappid
+            - PARSE_SERVER_MASTER_KEY=yourmasterkey
+            - PARSE_SERVER_DTA_URL=http://35.200.49.68/dta-trials
+              #- PARSE_SERVER_DATABASE_URI=postgres://mastreeuser:password@postgres:5432/postgres
+            - PARSE_SERVER_DATABASE_URI=mongodb://mongo:27017/parse
+            - PARSE_SERVER_START_LIVE_QUERY_SERVER=1
+            - PARSE_SERVER_LIVE_QUERY={"classNames":["Sessions", "TrialSession"],"redisUrl":"redis://redis:6379"}
+            - PARSE_SERVER_CLOUD=/parse-server/cloud/main.js
+            - PARSE_SERVER_LIVE_QUERY_SERVER_OPTIONS={"redisUrl":"redis://redis:6379","redisOptions":{"url":"redis://redis:6379"}}
+        volumes:
+            - ./cloud:/parse-server/cloud
+    dashboard:
+        image: parseplatform/parse-dashboard
+        ports:
+            - 4040:4040
+        environment:
+            - PARSE_DASHBOARD_SERVER_URL=http://localhost:1337/parse
+            - PARSE_DASHBOARD_APP_ID=yourappid
+            - PARSE_DASHBOARD_MASTER_KEY=yourmasterkey
+            - PARSE_DASHBOARD_APP_NAME=MyApp
+            - PARSE_DASHBOARD_ALLOW_INSECURE_HTTP=1
+            - PARSE_DASHBOARD_USER_ID=user
+            - PARSE_DASHBOARD_USER_PASSWORD=pass
