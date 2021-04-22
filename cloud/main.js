@@ -75,8 +75,11 @@ const sendHTTPReq = async (userId, id, userType) => {
 
 const joinDynamicTrialSession= async (queryName) => {
   try {
-    if (queryName.userId && queryName.id && queryName.userType) {
-      sendHTTPReq(queryName.userId, queryName.id, queryName.userType)
+    if (queryName.userId && queryName.pgId && queryName.userType) {
+      pgId = parseInt(queryName.pgId) || 0
+      if(pgId > 0) { 
+        sendHTTPReq(queryName.userId, pgId, queryName.userType)
+      }
     }
   } catch(e) {
     console.log(e);
