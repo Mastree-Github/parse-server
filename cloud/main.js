@@ -105,7 +105,35 @@ const liveQueryTrigger = async (event, className, queryName, currentTime) => {
      {
       console.log(" ----- hitting the func ------")
       joinDynamicTrialSession(queryName);
-    }
+    } else if (event == SUBSCRIBE && className == 'Masterclass') {
+	let query = new Parse.Query(className);
+        query.equalTo('name', 'masterclassLive');
+        query
+          .find()
+          .then(let results => {
+            results.forEach(let live => {
+              live.increment('livecount');
+              live.save();
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });	
+   } else if ((event == DISCONNECT || event == UNSUBSCRIBE) && className == 'Masterclass') {
+	let query = new Parse.Query(className);
+        query.equalTo('name', 'masterclassLive');
+        query
+          .find()
+          .then(let results => {
+            results.forEach(let live => {
+              live.decrement('livecount');
+              live.save();
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+  }
   } catch (e) {
     console.log(e);
   }
