@@ -110,10 +110,10 @@ const liveQueryTrigger = async (event, className, queryName, currentTime) => {
         query.equalTo('name', 'masterclassLive');
         query
           .find()
-          .then(let results => {
-            results.forEach(let live => {
-              live.increment('livecount');
-              live.save();
+          .then(incResults => {
+            incResults.forEach(incLive => {
+              incLive.increment('livecount');
+              incLive.save();
             });
           })
           .catch(error => {
@@ -124,10 +124,10 @@ const liveQueryTrigger = async (event, className, queryName, currentTime) => {
         query.equalTo('name', 'masterclassLive');
         query
           .find()
-          .then(let results => {
-            results.forEach(let live => {
-              live.decrement('livecount');
-              live.save();
+          .then(decResults => {
+            decResults.forEach(decLive => {
+              decLive.decrement('livecount');
+              decLive.save();
             });
           })
           .catch(error => {
