@@ -1,4 +1,3 @@
-const query = new Parse.Query('SessionLogs');
 const SUBSCRIBE = 'subscribe';
 const DISCONNECT = 'ws_disconnect';
 const UNSUBSCRIBE = 'unsubscribe';
@@ -7,6 +6,7 @@ const DTA_URL = process.env.PARSE_SERVER_DTA_URL;
 
 const updateSessionLogs = async (value, queryName) => {
   if (queryName.sessionId && queryName.userIds) {
+    let query = new Parse.Query('SessionLogs');
     query.equalTo('sessionId', queryName.sessionId);
     query.equalTo('userId', queryName.userIds);
     query
